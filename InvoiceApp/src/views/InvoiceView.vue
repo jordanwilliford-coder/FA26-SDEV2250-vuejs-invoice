@@ -1,11 +1,19 @@
 <script setup>
 import { ref } from 'vue'
 import InvoiceRow from '../components/InvoiceRow.vue'
+import { computed } from 'vue'
+
 
 let nextId = 1
 const makeRow = () => ({ id: nextId++, description: '', qty: 1, price: 0 })
 
 const rows = ref([makeRow(), makeRow(), makeRow()])
+const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+const total = computed(() => {
+  return rows.value.reduce((sum, row) => {
+    return sum + row.qty * row.price;
+  }, 0);
+});
 
 function addRow(index) {
   rows.value.splice(index + 1, 0, makeRow())
@@ -37,6 +45,7 @@ function removeRow(index) {
         <InvoiceRow
           v-for="(row, index) in rows"
           :key="row.id"
+          v-model="rows[index]"
           @add="addRow(index)"
           @remove="removeRow(index)"
         />
